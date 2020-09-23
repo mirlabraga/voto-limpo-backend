@@ -1,12 +1,12 @@
-import { APIGatewayProxyHandler } from 'aws-lambda';
+import { APIGatewayProxyHandlerV2 } from 'aws-lambda';
 import 'source-map-support/register';
+import { buildRedictURI } from '../lib/oauth2';
 
-export const handler: APIGatewayProxyHandler = async (event, _context) => {
+export const handler: APIGatewayProxyHandlerV2 = async (_event, _context) => {
   return {
-    statusCode: 200,
-    body: JSON.stringify({
-      message: 'Go Serverless Webpack (Typescript) v1.0! Your function executed successfully!',
-      input: event,
-    }, null, 2),
+    statusCode: 302,
+    headers: {
+      Location: buildRedictURI(),
+    }
   };
 }

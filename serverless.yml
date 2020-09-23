@@ -7,9 +7,7 @@ custom:
   webpack:
     webpackConfig: ./webpack.config.js
     includeModules: true
-  s3Sync:
-    - bucketName: voto-limpo-bucket
-      localDir: build
+  secrets: ${ssm:/aws/reference/secretsmanager/voto-limpo/dev~true}
 
 plugins:
   - serverless-webpack
@@ -21,17 +19,24 @@ provider:
   region: eu-west-2
   apiGateway:
     minimumCompressionSize: 1024
-  environment: 1
+  environment:
+    GOOGLE_CLIENT_ID: ${self:custom.secrets.GOOGLE_CLIENT_ID}
+    GOOGLE_CLIENT_SECRET_KEY: ${self:custom.secrets.GOOGLE_CLIENT_SECRET_KEY}
+    BASE_URL: ${self:custom.secrets.BASE_URL}
 
 
 # Functions
 
 functions:
   signin:
-    handler: handler.signin
-  callback:
-    handler: handler.callback
-  refresh:
-    handler: handler.refresh
-  authorize:
-    handler: handler.authorize
+    handler: src/functions/signin.handler
+    events:
+      - http:
+          path: login
+          method: get
+  # callback:
+  #   handler: callback
+  # refresh:
+  #   handler: refresh
+  # authorize:
+  #   handler: authorize
