@@ -26,6 +26,14 @@ export const buidRedirectUri = (state: State) => {
   return `${state.redirect_uri}?${params.toString()}`;
 }
 
+export const buidRedirectUriError = (state: State, error: string, description: string) => {
+  const params = new URLSearchParams();
+  params.append('error', error);
+  params.append('error_description', description);
+
+  return `${state.redirect_uri}?${params.toString()}`;
+}
+
 const sha256 = (buffer: string) => {
   return crypto.createHash('sha256').update(buffer).digest();
 }

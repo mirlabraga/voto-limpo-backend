@@ -11,7 +11,8 @@ export interface State {
   scope: string
   response_type: string
   state: string
-  code_challenge: string
+  code_challenge: string,
+  expire_at: number
   token?: OAuth2Token
 }
 
@@ -24,6 +25,19 @@ export const putState = async (Item: State): Promise<void> => {
   if (result.$response.error) {
     console.error(`Could not put state ${Item.id}`, result.Attributes, result.$response.error)
     throw new Error(`Could not put state ${Item.id}`);
+  }
+}
+
+export const deleteState = async (Item: State): Promise<void> => {
+  const result = await docClient.delete({
+    TableName,
+    Key: {
+      id: Item.id
+    }
+  }).promise();
+  if (result.$response.error) {
+    console.error(`Could not delete state ${Item.id}`, result.Attributes, result.$response.error)
+    throw new Error(`Could not delete state ${Item.id}`);
   }
 }
 

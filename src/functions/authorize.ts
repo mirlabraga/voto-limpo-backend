@@ -23,7 +23,8 @@ export const handler: APIGatewayProxyHandlerV2 = async (event: APIGatewayProxyEv
     scope,
     response_type,
     state,
-    code_challenge
+    code_challenge,
+    expire_at: new Date().getTime() + (5 * 60 * 1000)
   };
 
   if (!checkClient(stateItem)) {
