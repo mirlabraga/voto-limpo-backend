@@ -25,6 +25,7 @@ provider:
     GOOGLE_CLIENT_SECRET_KEY: ${self:custom.secrets.GOOGLE_CLIENT_SECRET_KEY}
     BASE_URL: ${self:custom.secrets.BASE_URL}
     STATE_TABLE_NAME: { Ref: statesTable }
+    SUPPORTER_TABLE_NAME: { Ref: supportersTable }
     CLIENTS_CONFIGS: ${self:custom.secrets.CLIENTS_CONFIGS}
 
 # Functions
@@ -40,6 +41,7 @@ functions:
 
   callback:
     handler: src/functions/callback.handler
+    role: lambdaRole
     events:
       - http:
           path: callback
@@ -50,6 +52,18 @@ resources:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: state-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+    supportersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: supporters-${self:provider.stage}
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
@@ -101,3 +115,5 @@ resources:
                 Resource:
                 - "#{statesTable.Arn}"
                 - "#{statesTable.Arn}/*"
+                - "#{supportersTable.Arn}"
+                - "#{supportersTable.Arn}/*"

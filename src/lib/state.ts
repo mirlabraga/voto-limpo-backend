@@ -23,3 +23,17 @@ export const putState = async (Item: State): Promise<void> => {
     throw new Error(`Could not put state ${Item.id}`);
   }
 }
+
+export const getState = async (id: string): Promise<State | null> => {
+  const result = await docClient.get({
+    TableName,
+    Key: {
+      id
+    }
+  }).promise();
+  if (result.$response.error) {
+    console.error(`Could not get state ${id}`, result.$response.error)
+    throw new Error(`Could not get state ${id}`);
+  }
+  return result.Item as State;
+}
