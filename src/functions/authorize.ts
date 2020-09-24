@@ -14,7 +14,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event: APIGatewayProxyEv
     };
   }
 
-  const {client_id, redirect_uri, scope, response_type, state} = event.queryStringParameters;
+  const {client_id, redirect_uri, scope, response_type, state, code_challenge} = event.queryStringParameters;
 
   const stateItem = {
     id: uuid(),
@@ -22,7 +22,8 @@ export const handler: APIGatewayProxyHandlerV2 = async (event: APIGatewayProxyEv
     redirect_uri,
     scope,
     response_type,
-    state
+    state,
+    code_challenge
   };
 
   if (!checkClient(stateItem)) {

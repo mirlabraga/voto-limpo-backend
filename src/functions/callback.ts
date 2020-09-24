@@ -2,7 +2,7 @@ import { APIGatewayProxyEventV2, APIGatewayProxyHandlerV2 } from 'aws-lambda';
 import 'source-map-support/register';
 import { Oauth2Error, validateCode } from '../lib/oauth2';
 import { buidRedirectUri as buidRedirectUriFromState } from '../lib/oauth2Client';
-import { getState } from '../lib/state';
+import { getState, putState } from '../lib/state';
 import { putSupporter, buildSpporterFromToken } from '../lib/supporter';
 
 export const handler: APIGatewayProxyHandlerV2 = async (event: APIGatewayProxyEventV2, _context) => {
@@ -34,6 +34,8 @@ export const handler: APIGatewayProxyHandlerV2 = async (event: APIGatewayProxyEv
       };
     }
     const supporter = await buildSpporterFromToken(token);
+    stateItem.token = token;
+    await putState(stateItem);
     console.log('build supporter', supporter);
     await putSupporter(supporter);
     console.log('supporter saved', supporter);

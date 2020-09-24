@@ -46,6 +46,13 @@ functions:
       - http:
           path: callback
           method: get
+  token:
+    handler: src/functions/token.handler
+    role: lambdaRole
+    events:
+      - http:
+          path: token
+          method: post
 resources:
   Resources:
     statesTable:

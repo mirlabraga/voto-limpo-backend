@@ -1,4 +1,5 @@
 import * as AWS  from 'aws-sdk';
+import { OAuth2Token } from './oauth2';
 
 const docClient = new AWS.DynamoDB.DocumentClient({apiVersion: "2012-08-10"});
 const TableName = process.env.STATE_TABLE_NAME;
@@ -10,6 +11,8 @@ export interface State {
   scope: string
   response_type: string
   state: string
+  code_challenge: string
+  token?: OAuth2Token
 }
 
 
