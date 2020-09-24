@@ -11,6 +11,7 @@ custom:
 
 plugins:
   - serverless-webpack
+  - serverless-pseudo-parameters
 
 provider:
   name: aws
@@ -23,16 +24,18 @@ provider:
     GOOGLE_CLIENT_ID: ${self:custom.secrets.GOOGLE_CLIENT_ID}
     GOOGLE_CLIENT_SECRET_KEY: ${self:custom.secrets.GOOGLE_CLIENT_SECRET_KEY}
     BASE_URL: ${self:custom.secrets.BASE_URL}
-
+    STATE_TABLE_NAME: { Ref: statesTable }
+    CLIENTS_CONFIGS: ${self:custom.secrets.CLIENTS_CONFIGS}
 
 # Functions
 
 functions:
-  signin:
-    handler: src/functions/signin.handler
+  authorize:
+    handler: src/functions/authorize.handler
+    role: lambdaRole
     events:
       - http:
-          path: login
+          path: authorize
           method: get
 
   callback:
@@ -41,7 +44,60 @@ functions:
       - http:
           path: callback
           method: get
-  # refresh:
-  #   handler: refresh
-  # authorize:
-  #   handler: authorize
+resources:
+  Resources:
+    statesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: state-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+    lambdaRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:service.name}-${self:provider.stage}-lambda-role
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Action: sts:AssumeRole
+              Effect: Allow
+              Principal:
+                Service: lambda.amazonaws.com
+        Description: ''
+        Policies:
+          - PolicyName: ${self:service.name}-${self:provider.stage}-lambda-logs-policy
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+              - Effect: Allow
+                Action:
+                - "xray:PutTraceSegments"
+                - "xray:PutTelemetryRecords"
+                - "logs:CreateLogGroup"
+                - "logs:CreateLogStream"
+                - "logs:PutLogEvents"
+                Resource: "*"
+
+
+          - PolicyName: ${self:service.name}-${self:provider.stage}-lambda-dynamodb-policy
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+              - Action:
+                - dynamodb:DeleteItem
+                - dynamodb:GetItem
+                - dynamodb:PutItem
+                - dynamodb:Query
+                - dynamodb:Scan
+                - dynamodb:UpdateItem
+                - dynamodb:BatchGetItem
+                - dynamodb:BatchWriteItem
+                Effect: Allow
+                Resource:
+                - "#{statesTable.Arn}"
+                - "#{statesTable.Arn}/*"
