@@ -8,7 +8,7 @@ export interface Supporter {
   id: string
   name: string
   email: string
-  token: OAuth2Token
+  token?: OAuth2Token
 }
 
 export const buildSpporterFromToken = async (token: OAuth2Token) : Promise<Supporter> => {

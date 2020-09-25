@@ -53,6 +53,14 @@ functions:
       - http:
           path: token
           method: post
+
+  myEvents:
+    handler: src/functions/myEvents.handler
+    role: lambdaRole
+    events:
+      - http:
+          path: myEvents
+          method: get
 resources:
   Resources:
     statesTable:
