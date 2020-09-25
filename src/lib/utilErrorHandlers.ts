@@ -1,8 +1,8 @@
-import { APIGatewayProxyEventV2, APIGatewayProxyHandlerV2, APIGatewayProxyStructuredResultV2, Callback, Context } from "aws-lambda";
+import { APIGatewayProxyEventV2, APIGatewayProxyHandlerV2, APIGatewayProxyStructuredResultV2, Context } from "aws-lambda";
 
 
 export class HttpError extends Error {
-  constructor(statusCode: number, body?: string) {
+  constructor(public statusCode: number, public body?: any) {
     super(`Error with statusCode: ${statusCode} and body: ${body}`)
   }
 }
@@ -19,8 +19,11 @@ export const handlerErrors = <T>(func: FuncType<T>): APIGatewayProxyHandlerV2 =>
     } catch(e) {
       return {
         statusCode: e.statusCode || 500,
-        body: e.body || `Something happens: ${e}`
-      } as APIGatewayProxyStructuredResultV2
+        body: e.body ? JSON.stringify(e.body) : `Something happens: ${e}`,
+        headers: {
+          'Content-Type': e.body ? 'application/json' : 'text/plain'
+        }
+      }
     }
   }
 }

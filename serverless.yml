@@ -26,17 +26,18 @@ provider:
     BASE_URL: ${self:custom.secrets.BASE_URL}
     STATE_TABLE_NAME: { Ref: statesTable }
     SUPPORTER_TABLE_NAME: { Ref: supportersTable }
+    EVENTS_TABLE_NAME: { Ref: eventsTable }
     CLIENTS_CONFIGS: ${self:custom.secrets.CLIENTS_CONFIGS}
 
 # Functions
 
 functions:
-  authorize:
-    handler: src/functions/authorize.handler
+  signin:
+    handler: src/functions/signin.handler
     role: lambdaRole
     events:
       - http:
-          path: authorize
+          path: signin
           method: get
 
   callback:
@@ -53,7 +54,8 @@ functions:
       - http:
           path: token
           method: post
-
+  authorizer:
+    handler: src/functions/authorizer.handler
   myEvents:
     handler: src/functions/myEvents.handler
     role: lambdaRole
@@ -61,6 +63,9 @@ functions:
       - http:
           path: myEvents
           method: get
+          authorizer:
+            name: authorizer
+
 resources:
   Resources:
     statesTable:
@@ -85,6 +90,21 @@ resources:
         KeySchema:
           - AttributeName: id
             KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+    eventsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: events-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: supporterId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: supporterId
+            KeyType: HASH
+          - AttributeName: id
+            KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
     lambdaRole:
       Type: AWS::IAM::Role
@@ -132,3 +152,5 @@ resources:
                 - "#{statesTable.Arn}/*"
                 - "#{supportersTable.Arn}"
                 - "#{supportersTable.Arn}/*"
+                - "#{eventsTable.Arn}"
+                - "#{eventsTable.Arn}/*"
