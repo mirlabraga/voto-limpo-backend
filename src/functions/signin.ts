@@ -3,7 +3,7 @@ import 'source-map-support/register';
 import { buildRedictURI } from '../lib/oauth2';
 import { v4 as uuid } from 'uuid';
 import { checkClient } from '../lib/oauth2Client';
-import { putState } from '../lib/state';
+import { putState } from '../lib/datasources/state';
 
 export const handler: APIGatewayProxyHandlerV2 = async (event: APIGatewayProxyEventV2, _context) => {
 

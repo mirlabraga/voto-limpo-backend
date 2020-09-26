@@ -2,8 +2,8 @@ import { APIGatewayProxyEventV2, APIGatewayProxyHandlerV2 } from 'aws-lambda';
 import 'source-map-support/register';
 import { Oauth2Error, validateCode } from '../lib/oauth2';
 import { buidRedirectUri as buidRedirectUriFromState, buidRedirectUriError } from '../lib/oauth2Client';
-import { deleteState, getState, putState } from '../lib/state';
-import { putSupporter, buildSpporterFromToken } from '../lib/supporter';
+import { deleteState, getState, putState } from '../lib/datasources/state';
+import { putSupporter, buildSpporterFromToken } from '../lib/datasources/supporter';
 
 export const handler: APIGatewayProxyHandlerV2 = async (event: APIGatewayProxyEventV2, _context) => {
   if (!event.queryStringParameters) {

@@ -1,5 +1,5 @@
 import * as AWS  from 'aws-sdk';
-import { OAuth2Token } from './oauth2';
+import { OAuth2Token } from '../oauth2';
 
 const docClient = new AWS.DynamoDB.DocumentClient({apiVersion: "2012-08-10"});
 const TableName = process.env.STATE_TABLE_NAME;

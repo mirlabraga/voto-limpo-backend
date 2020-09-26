@@ -82,9 +82,9 @@ functions:
           path: events/{id}
           method: delete
           request:
-          parameters:
-            paths:
-              id: true
+            parameters:
+              paths:
+                id: true
           authorizer:
             name: authorizer
   editEvent:
@@ -95,9 +95,18 @@ functions:
           path: events/{id}
           method: put
           request:
-          parameters:
-            paths:
-              id: true
+            parameters:
+              paths:
+                id: true
+          authorizer:
+            name: authorizer
+  profile:
+    handler: src/functions/supporter.currentProfileScope
+    role: lambdaRole
+    events:
+      - http:
+          path: profile/scopes
+          method: get
           authorizer:
             name: authorizer
 resources:

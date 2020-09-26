@@ -1,5 +1,5 @@
 import { URLSearchParams } from "url";
-import { State } from "./state";
+import { State } from "./datasources/state";
 import * as crypto from 'crypto';
 import base64url from "base64url";
 

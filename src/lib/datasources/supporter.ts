@@ -1,4 +1,4 @@
-import { OAuth2Token, validateJwt } from "./oauth2";
+import { OAuth2Token, validateJwt } from "../oauth2";
 import * as AWS  from 'aws-sdk';
 
 const docClient = new AWS.DynamoDB.DocumentClient({apiVersion: "2012-08-10"});
@@ -32,7 +32,22 @@ export const putSupporter = async (Item: Supporter) => {
   }).promise();
 
   if (result.$response.error) {
-    console.error(`Could not put state ${Item.id}`, result.Attributes, result.$response.error)
-    throw new Error(`Could not put state ${Item.id}`);
+    console.error(`Could not put supporter ${Item.id}`, result.Attributes, result.$response.error)
+    throw new Error(`Could not put supporter ${Item.id}`);
   }
+}
+
+export const getSupporter = async (id: string): Promise<Supporter | null> => {
+  const result = await docClient.get({
+    TableName,
+    Key: {
+      id
+    }
+  }).promise();
+
+  if (result.$response.error) {
+    console.error(`Could not get supporter ${id}`, result.$response.error)
+    throw new Error(`Could not get supporter ${id}`);
+  }
+  return result.Item as Supporter;
 }

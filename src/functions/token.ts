@@ -1,5 +1,5 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyHandlerV2 } from "aws-lambda";
-import { deleteState, getState } from "../lib/state";
+import { deleteState, getState } from "../lib/datasources/state";
 import { validateCodeChallenge } from "../lib/oauth2Client";
 import { URLSearchParams } from "url";
 
