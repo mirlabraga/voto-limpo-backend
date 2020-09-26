@@ -6,7 +6,8 @@ const TableName = process.env.EVENTS_TABLE_NAME;
 export interface Event {
   id: string
   supporterId: string
-  date: string
+  date: string,
+  googleCalendar?: object
 }
 
 export const queryEvents = async (supporterId: string): Promise<Event[]> => {

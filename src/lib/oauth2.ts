@@ -13,7 +13,8 @@ export const OAUTH_CONFIG = {
   clientSecret: process.env.GOOGLE_CLIENT_SECRET_KEY,
   accessType: 'offline',
   prompt: 'consent',
-  callbackUrlBase: process.env.BASE_URL
+  callbackUrlBase: process.env.BASE_URL,
+  redirectUri: `${process.env.BASE_URL}/callback`
 }
 
 export interface OAuth2Token {
@@ -21,6 +22,7 @@ export interface OAuth2Token {
   expires_in: number,
   scope?: string,
   token_type: string,
+  refresh_token: string,
   id_token?: string
 }
 
@@ -68,7 +70,7 @@ export const validateJwt = async(jwtString: string): Promise<{ [key: string]: an
 export const buildRedictURI = (state: string, scope: string): string => {
   const params = new URLSearchParams();
   params.append('client_id', OAUTH_CONFIG.clientId);
-  params.append('redirect_uri', `${OAUTH_CONFIG.callbackUrlBase}/callback`);
+  params.append('redirect_uri', OAUTH_CONFIG.redirectUri);
   params.append('scope', scope);
   params.append('response_type', OAUTH_CONFIG.responseType);
   params.append('state', state);
@@ -87,7 +89,7 @@ export const validateCode = async (code: string, _state: string): Promise<OAuth2
   params.append('grant_type', 'authorization_code');
   params.append('client_id', OAUTH_CONFIG.clientId);
   params.append('client_secret', OAUTH_CONFIG.clientSecret);
-  params.append('redirect_uri', `${OAUTH_CONFIG.callbackUrlBase}/callback`);
+  params.append('redirect_uri', OAUTH_CONFIG.redirectUri);
   params.append('code', code);
 
   const response = await fetch(OAUTH_CONFIG.tokenUri, {

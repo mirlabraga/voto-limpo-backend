@@ -85,6 +85,19 @@ functions:
           method: post
           authorizer:
             name: authorizer
+  createGoogleMeeting:
+    handler: src/functions/events.createGoogleMeeting
+    role: lambdaRole
+    events:
+      - http:
+          path: events/{id}/google-meeting
+          method: post
+          request:
+            parameters:
+              paths:
+                id: true
+          authorizer:
+            name: authorizer
   deleteEvent:
     handler: src/functions/events.destroy
     role: lambdaRole
