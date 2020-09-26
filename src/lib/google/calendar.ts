@@ -1,12 +1,13 @@
-import { google } from "googleapis";
+import { calendar_v3, google } from "googleapis";
 import { Event } from "../datasources/events";
 import { Supporter } from "../datasources/supporter";
 import { OAUTH_CONFIG } from "../oauth2";
 import { v4 as uuid } from 'uuid';
 
 const CANDIDATE_EMAIL = process.env.CANDIDATE_EMAIL;
+const calendarId = 'primary';
 
-export const createCalendarEvent = async (supporter: Supporter, event: Event) => {
+const getAuth = (supporter: Supporter) => {
 
   const auth = new google.auth.OAuth2(
     OAUTH_CONFIG.clientId,
@@ -17,12 +18,20 @@ export const createCalendarEvent = async (supporter: Supporter, event: Event) =>
     refresh_token: supporter.token?.refresh_token
   });
 
+  return auth;
+}
+
+export const createCalendarEvent = async (supporter: Supporter, event: Event): Promise<calendar_v3.Schema$Event> => {
+
+  const auth = getAuth(supporter)
+
   const calendar = google.calendar({ version: 'v3', auth });
 
-  return await calendar.events.insert({
+  const result = await calendar.events.insert({
     auth,
-    calendarId: 'primary',
+    calendarId,
     conferenceDataVersion: 1,
+    sendUpdates: 'all',
     requestBody: {
       summary: 'Conversa com seu Candidato',
       attendees: [
@@ -49,4 +58,45 @@ export const createCalendarEvent = async (supporter: Supporter, event: Event) =>
       }
     }
   });
+
+  return result.data;
 }
+
+export const getCalendarEvent = async(supporter: Supporter, eventId: string): Promise<calendar_v3.Schema$Event | null> => {
+  const auth = getAuth(supporter)
+
+  const calendar = google.calendar({ version: 'v3', auth });
+
+  const result = await calendar.events.get({
+    calendarId,
+    eventId
+  });
+  return result.data
+}
+
+export const addAttendeeToEvent = async(supporter: Supporter, eventId: string, email: string):  Promise<calendar_v3.Schema$Event> => {
+  
+
+  const auth = getAuth(supporter)
+  const calendar = google.calendar({ version: 'v3', auth });
+
+  const eventData = await getCalendarEvent(supporter, eventId);
+  if (!eventData) {
+    throw new Error('Could not get Event');
+  }
+
+  eventData.attendees = eventData.attendees  || [];
+  eventData.attendees.push({
+    email
+  })
+
+  const response = await calendar.events.patch({
+    eventId,
+    calendarId,
+    sendUpdates: 'all',
+    requestBody: eventData
+  });
+  
+  return response.data;
+}
+

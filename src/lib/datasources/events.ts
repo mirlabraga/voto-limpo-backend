@@ -1,4 +1,5 @@
 import * as AWS  from 'aws-sdk';
+import { calendar_v3 } from 'googleapis';
 
 const docClient = new AWS.DynamoDB.DocumentClient({apiVersion: "2012-08-10"});
 const TableName = process.env.EVENTS_TABLE_NAME;
@@ -7,7 +8,7 @@ export interface Event {
   id: string
   supporterId: string
   date: string,
-  googleCalendar?: object
+  googleCalendar?: calendar_v3.Schema$Event
 }
 
 export const queryEvents = async (supporterId: string): Promise<Event[]> => {

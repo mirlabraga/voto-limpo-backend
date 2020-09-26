@@ -27,6 +27,7 @@ provider:
     STATE_TABLE_NAME: { Ref: statesTable }
     SUPPORTER_TABLE_NAME: { Ref: supportersTable }
     EVENTS_TABLE_NAME: { Ref: eventsTable }
+    CONSENT_TABLE_NAME: { Ref: consentsTable }
     CLIENTS_CONFIGS: ${self:custom.secrets.CLIENTS_CONFIGS}
     CANDIDATE_EMAIL: ${self:custom.secrets.CANDIDATE_EMAIL}
     CANDIDATE_NAME: ${self:custom.secrets.CANDIDATE_NAME}
@@ -128,6 +129,19 @@ functions:
                 id: true
           authorizer:
             name: authorizer
+  joinEvent:
+    handler: src/functions/events.join
+    role: lambdaRole
+    events:
+      - http:
+          path: supporter/{id}/events/{eventId}/join
+          method: post
+          request:
+            parameters:
+              paths:
+                eventId: true
+                id: true
+    
   profile:
     handler: src/functions/supporter.currentProfileScope
     role: lambdaRole
@@ -175,6 +189,21 @@ resources:
           - AttributeName: supporterId
             KeyType: HASH
           - AttributeName: id
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+    consentsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: consents-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: email
+            AttributeType: S
+          - AttributeName: supporterId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: supporterId
+            KeyType: HASH
+          - AttributeName: email
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
     lambdaRole:
@@ -225,3 +254,5 @@ resources:
                 - "#{supportersTable.Arn}/*"
                 - "#{eventsTable.Arn}"
                 - "#{eventsTable.Arn}/*"
+                - "#{consentsTable.Arn}"
+                - "#{consentsTable.Arn}/*"
