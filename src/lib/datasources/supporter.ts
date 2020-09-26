@@ -1,5 +1,6 @@
 import { OAuth2Token, validateJwt } from "../oauth2";
 import * as AWS  from 'aws-sdk';
+import { calendar_v3 } from 'googleapis';
 
 const docClient = new AWS.DynamoDB.DocumentClient({apiVersion: "2012-08-10"});
 const TableName = process.env.SUPPORTER_TABLE_NAME;
@@ -9,6 +10,7 @@ export interface Supporter {
   name: string
   email: string
   token?: OAuth2Token
+  voteMeeting?: calendar_v3.Schema$Event
 }
 
 export const buildSpporterFromToken = async (token: OAuth2Token) : Promise<Supporter> => {

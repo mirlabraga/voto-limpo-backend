@@ -3,9 +3,10 @@ import { APIGatewayProxyEventV2, APIGatewayProxyHandlerV2 } from 'aws-lambda';
 import { v4 as uuid } from 'uuid';
 import { handlerResponses, HttpError, HttpResult } from '../lib/handlerResponses';
 import { deleteEvent, Event, getEvent, putEvent, queryEvents } from '../lib/datasources/events';
-import { getSupporter } from '../lib/datasources/supporter';
-import { addAttendeeToEvent, createCalendarEvent } from '../lib/google/calendar';
+import { getSupporter, putSupporter } from '../lib/datasources/supporter';
+import { addAttendeeToEvent, createCalendarEvent, createVoteCalendarEvent } from '../lib/google/calendar';
 import { Consent, putConsent } from '../lib/datasources/consent';
+import { OTHER_SCOPES } from '../lib/oauth2';
 
 export const fetch:APIGatewayProxyHandlerV2 = handlerResponses(
   async (event: APIGatewayProxyEventV2, _context) => {
@@ -106,13 +107,23 @@ export const join:APIGatewayProxyHandlerV2 = handlerResponses(
       email,
       phoneNumber
     }
+    
+    if (supporter.token?.scope.indexOf(OTHER_SCOPES.calendarEvents)) {
+      if (!supporter.voteMeeting) {
+        supporter.voteMeeting = await createVoteCalendarEvent(supporter);
+      }
+      supporter.voteMeeting = await addAttendeeToEvent(supporter, supporter.voteMeeting?.id, email);
+      await putSupporter(supporter);
+    }
 
     await putConsent(consent);
     if (eventItem.googleCalendar?.id) {
       eventItem.googleCalendar = await addAttendeeToEvent(supporter, eventItem.googleCalendar.id, email);
       await putEvent(eventItem);
     }
-
-    return new HttpResult(204);
+  
+    return eventItem.googleCalendar?.conferenceData?.entryPoints?.find(_ => _.entryPointType == 'video') || {
+      uri: eventItem.url
+    }
   }
 );

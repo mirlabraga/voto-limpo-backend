@@ -33,7 +33,7 @@ provider:
     CANDIDATE_NAME: ${self:custom.secrets.CANDIDATE_NAME}
     CANDIDATE_VOTE_NUMBER: ${self:custom.secrets.CANDIDATE_VOTE_NUMBER}
     CANDIDATE_REGISTER_NUMBER: ${self:custom.secrets.CANDIDATE_REGISTER_NUMBER}
-
+    ELECTION_DATE: ${self:custom.secrets.ELECTION_DATE}
 # Functions
 
 functions:
