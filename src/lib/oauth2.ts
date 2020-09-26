@@ -2,12 +2,12 @@ import fetch from 'node-fetch';
 import { URLSearchParams } from 'url';
 import * as jwt from 'jsonwebtoken';
 
-// const otherScopes = 'https://www.googleapis.com/auth/contacts.readonly https://www.googleapis.com/auth/calendar';
-const config = {
+// const otherScopes = 'https://www.googleapis.com/auth/contacts.readonly https://www.googleapis.com/auth/calendar.events';
+export const OAUTH_CONFIG = {
   signinUri: 'https://accounts.google.com/o/oauth2/v2/auth',
   tokenUri: 'https://oauth2.googleapis.com/token',
   auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
-  scope: 'profile email',
+  scope: "openid https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile",
   responseType: 'code',
   clientId: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET_KEY,
@@ -28,7 +28,7 @@ interface CertsKeyMap {
   [kid: string]: string
 }
 
-const CERTS_KEYS: Promise<CertsKeyMap> = fetch(config.auth_provider_x509_cert_url)
+const CERTS_KEYS: Promise<CertsKeyMap> = fetch(OAUTH_CONFIG.auth_provider_x509_cert_url)
   .then((response) => {
     if (response.ok) {
       return response.json();
@@ -65,17 +65,17 @@ export const validateJwt = async(jwtString: string): Promise<{ [key: string]: an
   })
 }
 
-export const buildRedictURI = (state: string): string => {
+export const buildRedictURI = (state: string, scope: string): string => {
   const params = new URLSearchParams();
-  params.append('client_id', config.clientId);
-  params.append('redirect_uri', `${config.callbackUrlBase}/callback`);
-  params.append('scope', config.scope);
-  params.append('response_type', config.responseType);
+  params.append('client_id', OAUTH_CONFIG.clientId);
+  params.append('redirect_uri', `${OAUTH_CONFIG.callbackUrlBase}/callback`);
+  params.append('scope', scope);
+  params.append('response_type', OAUTH_CONFIG.responseType);
   params.append('state', state);
-  params.append('access_type', config.accessType);
-  params.append('prompt', config.prompt);
+  params.append('access_type', OAUTH_CONFIG.accessType);
+  params.append('prompt', OAUTH_CONFIG.prompt);
 
-  return `${config.signinUri}?${params.toString()}`;
+  return `${OAUTH_CONFIG.signinUri}?${params.toString()}`;
 }
 
 export class Oauth2Error {
@@ -85,12 +85,12 @@ export class Oauth2Error {
 export const validateCode = async (code: string, _state: string): Promise<OAuth2Token | Oauth2Error> => {
   const params = new URLSearchParams();
   params.append('grant_type', 'authorization_code');
-  params.append('client_id', config.clientId);
-  params.append('client_secret', config.clientSecret);
-  params.append('redirect_uri', `${config.callbackUrlBase}/callback`);
+  params.append('client_id', OAUTH_CONFIG.clientId);
+  params.append('client_secret', OAUTH_CONFIG.clientSecret);
+  params.append('redirect_uri', `${OAUTH_CONFIG.callbackUrlBase}/callback`);
   params.append('code', code);
 
-  const response = await fetch(config.tokenUri, {
+  const response = await fetch(OAUTH_CONFIG.tokenUri, {
     method: 'post',
     body: params.toString(),
     headers: {

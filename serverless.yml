@@ -33,12 +33,23 @@ provider:
 
 functions:
   signin:
-    handler: src/functions/signin.handler
+    handler: src/functions/signin.login
     role: lambdaRole
     events:
       - http:
           path: signin
           method: get
+  addScope:
+    handler: src/functions/signin.addScope
+    role: lambdaRole
+    events:
+      - http:
+          path: supporter/{id}/add-scope
+          method: get
+          request:
+            parameters:
+              paths:
+                id: true
 
   callback:
     handler: src/functions/callback.handler

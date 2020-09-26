@@ -3,7 +3,7 @@ import 'source-map-support/register';
 import { Oauth2Error, validateCode } from '../lib/oauth2';
 import { buidRedirectUri as buidRedirectUriFromState, buidRedirectUriError } from '../lib/oauth2Client';
 import { deleteState, getState, putState } from '../lib/datasources/state';
-import { putSupporter, buildSpporterFromToken } from '../lib/datasources/supporter';
+import { putSupporter, buildSpporterFromToken, getSupporter } from '../lib/datasources/supporter';
 
 export const handler: APIGatewayProxyHandlerV2 = async (event: APIGatewayProxyEventV2, _context) => {
   if (!event.queryStringParameters) {
@@ -46,12 +46,23 @@ export const handler: APIGatewayProxyHandlerV2 = async (event: APIGatewayProxyEv
         }
       };
     }
-    const supporter = await buildSpporterFromToken(token);
+    const supporterFromToken = await buildSpporterFromToken(token);
     stateItem.token = token;
+    let supporter = await getSupporter(supporterFromToken.id);
+
+    if (!supporter) {
+      supporter = supporterFromToken;
+    } else {
+      const scopeFromToken = token.scope?.split(' ') || [];
+      const scopeFromDb = supporter.token?.scope?.split(' ') || [];
+
+      if (scopeFromToken.length > scopeFromDb.length) {
+        supporter.token = token;
+      }
+    }
+
     await putState(stateItem);
-    console.log('build supporter', supporter);
     await putSupporter(supporter);
-    console.log('supporter saved', supporter);
     return {
       statusCode: 302,
       headers: {
