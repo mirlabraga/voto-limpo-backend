@@ -28,6 +28,10 @@ provider:
     SUPPORTER_TABLE_NAME: { Ref: supportersTable }
     EVENTS_TABLE_NAME: { Ref: eventsTable }
     CLIENTS_CONFIGS: ${self:custom.secrets.CLIENTS_CONFIGS}
+    CANDIDATE_EMAIL: ${self:custom.secrets.CANDIDATE_EMAIL}
+    CANDIDATE_NAME: ${self:custom.secrets.CANDIDATE_NAME}
+    CANDIDATE_VOTE_NUMBER: ${self:custom.secrets.CANDIDATE_VOTE_NUMBER}
+    CANDIDATE_REGISTER_NUMBER: ${self:custom.secrets.CANDIDATE_REGISTER_NUMBER}
 
 # Functions
 

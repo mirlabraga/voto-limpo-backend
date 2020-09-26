@@ -2,7 +2,9 @@ import { google } from "googleapis";
 import { Event } from "../datasources/events";
 import { Supporter } from "../datasources/supporter";
 import { OAUTH_CONFIG } from "../oauth2";
+import { v4 as uuid } from 'uuid';
 
+const CANDIDATE_EMAIL = process.env.CANDIDATE_EMAIL;
 
 export const createCalendarEvent = async (supporter: Supporter, event: Event) => {
 
@@ -20,16 +22,25 @@ export const createCalendarEvent = async (supporter: Supporter, event: Event) =>
   return await calendar.events.insert({
     auth,
     calendarId: 'primary',
+    conferenceDataVersion: 1,
     requestBody: {
       summary: 'Conversa com seu Candidato',
       attendees: [
         {
-          email: 'fernandochucre@gmail.com',
+          email: CANDIDATE_EMAIL,
         },
         {
           email: supporter.email,
         }
       ],
+      conferenceData: {
+        createRequest: {
+          requestId: uuid(),
+          conferenceSolutionKey: {
+            type: "hangoutsMeet"
+          }
+        }
+      },
       start: {
         dateTime: event.date,
       },
