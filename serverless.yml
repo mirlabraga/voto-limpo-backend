@@ -56,16 +56,50 @@ functions:
           method: post
   authorizer:
     handler: src/functions/authorizer.handler
-  myEvents:
-    handler: src/functions/myEvents.handler
+  events:
+    handler: src/functions/events.fetch
     role: lambdaRole
     events:
       - http:
-          path: myEvents
+          path: events
           method: get
           authorizer:
             name: authorizer
-
+  createEvent:
+    handler: src/functions/events.create
+    role: lambdaRole
+    events:
+      - http:
+          path: events
+          method: post
+          authorizer:
+            name: authorizer
+  deleteEvent:
+    handler: src/functions/events.destroy
+    role: lambdaRole
+    events:
+      - http:
+          path: events/{id}
+          method: delete
+          request:
+          parameters:
+            paths:
+              id: true
+          authorizer:
+            name: authorizer
+  editEvent:
+    handler: src/functions/events.edit
+    role: lambdaRole
+    events:
+      - http:
+          path: events/{id}
+          method: put
+          request:
+          parameters:
+            paths:
+              id: true
+          authorizer:
+            name: authorizer
 resources:
   Resources:
     statesTable:

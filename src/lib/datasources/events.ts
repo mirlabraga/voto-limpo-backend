@@ -24,3 +24,46 @@ export const queryEvents = async (supporterId: string): Promise<Event[]> => {
   }
   return result.Items as Event[];
 }
+
+export const putEvent = async (Item: Event): Promise<void> => {
+  const result = await docClient.put({
+    TableName,
+    Item
+  }).promise();
+
+  if (result.$response.error) {
+    console.error(`Could not put event ${Item}`, result.$response.error)
+    throw new Error(`Could not put event ${Item}`);
+  }
+}
+
+export const deleteEvent = async (Item: Event): Promise<void> => {
+  const result = await docClient.delete({
+    TableName,
+    Key: {
+      supporterId: Item.supporterId,
+      id: Item.id
+    }
+  }).promise();
+
+  if (result.$response.error) {
+    console.error(`Could not delete event ${Item}`, result.$response.error)
+    throw new Error(`Could not delete event ${Item}`);
+  }
+}
+
+export const getEvent = async (supporterId: string, id: string): Promise<Event | null> => {
+  const result = await docClient.get({
+    TableName,
+    Key: {
+      supporterId,
+      id
+    }
+  }).promise();
+
+  if (result.$response.error) {
+    console.error(`Could not get event supporterId: ${supporterId} - id: ${id}`, result.$response.error)
+    throw new Error(`Could not get event supporterId: ${supporterId} - id: ${id}`);
+  }
+  return result.Item as Event;
+}
