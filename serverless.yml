@@ -89,6 +89,7 @@ functions:
       - http:
           path: events
           method: get
+          cors: true
           authorizer:
             name: authorizer
   createEvent:
@@ -98,6 +99,7 @@ functions:
       - http:
           path: events
           method: post
+          cors: true
           authorizer:
             name: authorizer
   createGoogleMeeting:
@@ -107,6 +109,7 @@ functions:
       - http:
           path: events/{id}/google-meeting
           method: post
+          cors: true
           request:
             parameters:
               paths:
@@ -120,6 +123,7 @@ functions:
       - http:
           path: events/{id}
           method: delete
+          cors: true
           request:
             parameters:
               paths:
@@ -133,6 +137,7 @@ functions:
       - http:
           path: events/{id}
           method: put
+          cors: true
           request:
             parameters:
               paths:
@@ -146,6 +151,7 @@ functions:
       - http:
           path: events/{id}/invite
           method: post
+          cors: true
           request:
             parameters:
               paths:
@@ -159,6 +165,7 @@ functions:
       - http:
           path: supporter/{id}/events/{eventId}/join
           method: post
+          cors: true
           request:
             parameters:
               paths:
