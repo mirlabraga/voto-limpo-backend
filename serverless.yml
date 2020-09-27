@@ -142,7 +142,7 @@ functions:
               paths:
                 eventId: true
                 id: true
-    
+
   profile:
     handler: src/functions/supporter.currentProfileScope
     role: lambdaRole
@@ -152,6 +152,16 @@ functions:
           method: get
           authorizer:
             name: authorizer
+  contacts:
+    handler: src/functions/supporter.contacts
+    role: lambdaRole
+    events:
+      - http:
+          path: profile/contacts
+          method: get
+          authorizer:
+            name: authorizer
+
 resources:
   Resources:
     statesTable:

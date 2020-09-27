@@ -1,9 +1,9 @@
 import { calendar_v3, google } from "googleapis";
 import { Event } from "../datasources/events";
 import { Supporter } from "../datasources/supporter";
-import { OAUTH_CONFIG } from "../oauth2";
 import { v4 as uuid } from 'uuid';
 import { parseZone } from 'moment';
+import { getAuth } from "./auth";
 
 const CANDIDATE_EMAIL = process.env.CANDIDATE_EMAIL;
 const CANDIDATE_NAME = process.env.CANDIDATE_NAME;
@@ -11,19 +11,7 @@ const CANDIDATE_VOTE_NUMBER = process.env.CANDIDATE_VOTE_NUMBER;
 const ELECTION_DATE = process.env.ELECTION_DATE;
 const calendarId = 'primary';
 
-const getAuth = (supporter: Supporter) => {
 
-  const auth = new google.auth.OAuth2(
-    OAUTH_CONFIG.clientId,
-    OAUTH_CONFIG.clientSecret,
-    OAUTH_CONFIG.redirectUri
-  );
-  auth.setCredentials({
-    refresh_token: supporter.token?.refresh_token
-  });
-
-  return auth;
-}
 export const createVoteCalendarEvent = async (supporter: Supporter): Promise<calendar_v3.Schema$Event> => {
 
   const auth = getAuth(supporter)
