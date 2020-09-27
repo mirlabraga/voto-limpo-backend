@@ -130,6 +130,19 @@ functions:
                 id: true
           authorizer:
             name: authorizer
+  inviteEvent:
+    handler: src/functions/events.invite
+    role: lambdaRole
+    events:
+      - http:
+          path: events/{id}/invite
+          method: post
+          request:
+            parameters:
+              paths:
+                id: true
+          authorizer:
+            name: authorizer
   joinEvent:
     handler: src/functions/events.join
     role: lambdaRole

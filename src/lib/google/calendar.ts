@@ -106,9 +106,8 @@ export const getCalendarEvent = async(supporter: Supporter, eventId: string): Pr
   return result.data
 }
 
-export const addAttendeeToEvent = async(supporter: Supporter, eventId: string, email: string):  Promise<calendar_v3.Schema$Event> => {
+export const addAttendeeToEvent = async(supporter: Supporter, eventId: string, emails: string | string[]):  Promise<calendar_v3.Schema$Event> => {
   
-
   const auth = getAuth(supporter)
   const calendar = google.calendar({ version: 'v3', auth });
 
@@ -118,9 +117,13 @@ export const addAttendeeToEvent = async(supporter: Supporter, eventId: string, e
   }
 
   eventData.attendees = eventData.attendees  || [];
-  eventData.attendees.push({
+  if (!Array.isArray(emails)) {
+    emails = [emails]
+  }
+  const attendees = emails.map(email => ({
     email
-  })
+  }))
+  eventData.attendees.push(...attendees);
 
   const response = await calendar.events.patch({
     eventId,

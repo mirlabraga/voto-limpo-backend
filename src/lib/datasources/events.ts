@@ -9,7 +9,8 @@ export interface Event {
   supporterId: string
   date: string,
   googleCalendar?: calendar_v3.Schema$Event
-  url?: string
+  url?: string,
+  invites?: string[]
 }
 
 export const queryEvents = async (supporterId: string): Promise<Event[]> => {

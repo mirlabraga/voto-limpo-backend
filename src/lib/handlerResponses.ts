@@ -35,7 +35,7 @@ export const handlerResponses = <T>(func: FuncType<T>): APIGatewayProxyHandlerV2
           }
         }
     } catch(e) {
-      const customError = !!e.statusCode
+      const customError = !!e.statusCode;
       const statusCode = customError ? e.statusCode : 500;
       const body = customError ? JSON.stringify(e.body) : `Something happens: ${e}`
       if (!customError) {
