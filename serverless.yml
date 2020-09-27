@@ -69,6 +69,7 @@ functions:
       - http:
           path: token
           method: post
+          cors: true
   authorizer:
     handler: src/functions/authorizer.handler
   events:

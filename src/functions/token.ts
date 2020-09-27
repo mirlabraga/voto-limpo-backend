@@ -16,14 +16,14 @@ export const handler: APIGatewayProxyHandlerV2 = handlerResponses(async (event: 
 
   const stateItem = await getState(stateId);
   if (!stateItem || !stateItem.token) {
-    return new HttpError(400, { error: "invalid_state", error_description: "invalid state" });
+    throw new HttpError(400, { error: "invalid_state", error_description: "invalid state" });
   }
   const isSame = stateItem?.state == clientState;
   const isValid = validateCodeChallenge(stateItem.code_challenge, codeVerifier);
   const { access_token, expires_in, id_token, token_type } = stateItem?.token;
   await deleteState(stateItem);
   if (!isValid || !isSame) {
-    return new HttpError(400, { error: "invalid_state", error_description: "invalid state" });
+    throw new HttpError(400, { error: "invalid_state", error_description: "invalid state" });
   }
   return {
     access_token,

@@ -16,6 +16,9 @@ export class HttpResult implements APIGatewayProxyStructuredResultV2 {
 type FuncType<T> = (event: APIGatewayProxyEventV2, context: Context) => Promise<T>;
 
 export const handlerResponses = <T>(func: FuncType<T>): APIGatewayProxyHandlerV2 => {
+  const commonHeaders = {
+    'access-control-allow-origin': '*'
+  }
   return async (event: APIGatewayProxyEventV2, context: Context): Promise<APIGatewayProxyStructuredResultV2> => {
     try {
         const result = await func(event, context);
@@ -24,7 +27,11 @@ export const handlerResponses = <T>(func: FuncType<T>): APIGatewayProxyHandlerV2
         } else {
           return {
             statusCode: 200,
-            body: JSON.stringify(result)
+            body: JSON.stringify(result),
+            headers: {
+              ...commonHeaders,
+              'Content-Type': 'application/json',
+            }
           }
         }
     } catch(e) {
@@ -35,6 +42,7 @@ export const handlerResponses = <T>(func: FuncType<T>): APIGatewayProxyHandlerV2
         statusCode,
         body,
         headers: {
+          ...commonHeaders,
           'Content-Type': e.body ? 'application/json' : 'text/plain'
         }
       }
