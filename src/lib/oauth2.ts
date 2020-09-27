@@ -2,7 +2,10 @@ import fetch from 'node-fetch';
 import { URLSearchParams } from 'url';
 import * as jwt from 'jsonwebtoken';
 
-// const otherScopes = 'https://www.googleapis.com/auth/contacts.readonly https://www.googleapis.com/auth/calendar.events';
+export const OTHER_SCOPES = {
+  contacts: 'https://www.googleapis.com/auth/contacts.readonly',
+  calendarEvents: 'https://www.googleapis.com/auth/calendar.events',
+}
 export const OAUTH_CONFIG = {
   signinUri: 'https://accounts.google.com/o/oauth2/v2/auth',
   tokenUri: 'https://oauth2.googleapis.com/token',
