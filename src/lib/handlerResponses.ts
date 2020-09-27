@@ -22,16 +22,14 @@ export const handlerResponses = <T>(func: FuncType<T>): APIGatewayProxyHandlerV2
   return async (event: APIGatewayProxyEventV2, context: Context): Promise<APIGatewayProxyStructuredResultV2> => {
     try {
         const result = await func(event, context);
-        if (result instanceof HttpResult) {
-          return result;
-        } else {
-          return {
-            statusCode: 200,
-            body: JSON.stringify(result),
-            headers: {
-              ...commonHeaders,
-              'Content-Type': 'application/json',
-            }
+        const isHttpResult = result instanceof HttpResult;
+        return {
+          statusCode: isHttpResult ? result['statusCode'] : 200,
+          body: isHttpResult ? result['body'] : JSON.stringify(result),
+          headers: {
+            ...commonHeaders,
+            'Content-Type': 'application/json',
+            ...(result['headers'] || {} ),
           }
         }
     } catch(e) {
