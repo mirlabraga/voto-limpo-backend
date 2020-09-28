@@ -13,13 +13,14 @@ export const fetch:APIGatewayProxyHandlerV2 = handlerResponses(
     const supporterId = event.requestContext.authorizer['principalId'];
     const events = await queryEvents(supporterId);
     return events.map(({id, supporterId, date, googleCalendar}: Event) => {
+
       return {
         id,
         supporterId,
         date,
-        googleCalendar: {
+        googleCalendar: googleCalendar && {
           attendees: googleCalendar.attendees,
-          conferenceData: {
+          conferenceData: googleCalendar.conferenceData && {
             entryPoints: googleCalendar.conferenceData?.entryPoints
           }
         }
