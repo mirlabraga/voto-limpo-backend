@@ -179,6 +179,7 @@ functions:
       - http:
           path: profile/scopes
           method: get
+          cors: true
           authorizer:
             name: authorizer
   contacts:
@@ -188,6 +189,7 @@ functions:
       - http:
           path: profile/contacts
           method: get
+          cors: true
           authorizer:
             name: authorizer
 
