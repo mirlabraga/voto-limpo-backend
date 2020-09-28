@@ -33,17 +33,25 @@ interface CertsKeyMap {
   [kid: string]: string
 }
 
-const CERTS_KEYS: Promise<CertsKeyMap> = fetch(OAUTH_CONFIG.auth_provider_x509_cert_url)
-  .then((response) => {
-    if (response.ok) {
-      return response.json();
-    } else {
-      return {};
-    }
-  });
+let CERTS_KEYS: CertsKeyMap | null = null;
+
+const loadCerts = async(count: number = 3): Promise<void> => {
+  const result = await fetch(OAUTH_CONFIG.auth_provider_x509_cert_url);
+  if (result.ok) {
+    CERTS_KEYS = await result.json();
+  } else {
+    await loadCerts(count--);
+  }
+}
 
 const getCert = async (kid: string): Promise<string|null> => {
-  return (await CERTS_KEYS)[kid];
+  if (!CERTS_KEYS) {
+    await loadCerts();
+  }
+  if (!CERTS_KEYS) {
+    throw new Error('Could not load Google cert keys');
+  }
+  return CERTS_KEYS[kid];
 }
 
 export const validateJwt = async(jwtString: string): Promise<{ [key: string]: any }>  => {

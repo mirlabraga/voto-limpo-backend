@@ -7,7 +7,7 @@ custom:
   webpack:
     webpackConfig: ./webpack.config.js
     includeModules: true
-  secrets: ${ssm:/aws/reference/secretsmanager/voto-limpo/dev~true}
+  secrets: ${ssm:/aws/reference/secretsmanager/voto-limpo/${self:provider.stage}~true}
   customDomain:
     domainName: app.diadovoto.com
     basePath: '${self:provider.stage}'
