@@ -10,7 +10,7 @@ custom:
   secrets: ${ssm:/aws/reference/secretsmanager/voto-limpo/dev~true}
   customDomain:
     domainName: app.diadovoto.com
-    basePath: '${self:prstage}'
+    basePath: '${self:provider.stage}'
     stage: ${self:provider.stage}
     createRoute53Record: true
     # certificateArn: arn:aws:acm:eu-west-2:551430625296:certificate/46ae4053-2c2f-4d48-95e2-1d091b4fc914
@@ -25,6 +25,7 @@ plugins:
 provider:
   name: aws
   runtime: nodejs12.x
+  stage: ${opt:stage, 'dev'}
   timeout: 19
   region: eu-west-2
   apiGateway:
