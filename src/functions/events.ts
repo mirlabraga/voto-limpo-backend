@@ -19,6 +19,7 @@ export const fetch:APIGatewayProxyHandlerV2 = handlerResponses(
         supporterId,
         date,
         googleCalendar: googleCalendar && {
+          id: googleCalendar.id,
           attendees: googleCalendar.attendees,
           conferenceData: googleCalendar.conferenceData && {
             entryPoints: googleCalendar.conferenceData?.entryPoints
