@@ -35,8 +35,8 @@ export const handler: APIGatewayAuthorizerHandler = async (event: APIGatewayToke
         name: claims.name,
         email: claims.email
       }
-    }, 'Allow', event.methodArn);
+    }, 'Allow', "arn:aws:execute-api:*:*:*");
   } catch (error) {
-    return generatePolicy({id: 'user'}, 'Deny', event.methodArn);
+    return generatePolicy({id: 'user'}, 'Deny', "arn:aws:execute-api:*:*:*");
   }
 }

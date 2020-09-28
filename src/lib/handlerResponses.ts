@@ -17,7 +17,8 @@ type FuncType<T> = (event: APIGatewayProxyEventV2, context: Context) => Promise<
 
 export const handlerResponses = <T>(func: FuncType<T>): APIGatewayProxyHandlerV2 => {
   const commonHeaders = {
-    'access-control-allow-origin': '*'
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true
   }
   return async (event: APIGatewayProxyEventV2, context: Context): Promise<APIGatewayProxyStructuredResultV2> => {
     try {
