@@ -12,7 +12,19 @@ export const fetch:APIGatewayProxyHandlerV2 = handlerResponses(
   async (event: APIGatewayProxyEventV2, _context) => {
     const supporterId = event.requestContext.authorizer['principalId'];
     const events = await queryEvents(supporterId);
-    return events;
+    return events.map(({id, supporterId, date, googleCalendar}: Event) => {
+      return {
+        id,
+        supporterId,
+        date,
+        googleCalendar: {
+          attendees: googleCalendar.attendees,
+          conferenceData: {
+            entryPoints: googleCalendar.conferenceData?.entryPoints
+          }
+        }
+      }
+    });
   }
 );
 
@@ -124,11 +136,11 @@ export const join:APIGatewayProxyHandlerV2 = handlerResponses(
       email,
       phoneNumber
     }
-    
+
     await putConsent(consent);
-    
+
     await createAndSetMeetings(supporter, eventItem, [email]);
-  
+
     return eventItem.googleCalendar?.conferenceData?.entryPoints?.find(_ => _.entryPointType == 'video') || {
       uri: eventItem.url
     }
@@ -153,7 +165,7 @@ export const invite:APIGatewayProxyHandlerV2 = handlerResponses(
       throw new HttpError(404);
     }
     console.log('got event:', eventItem);
-    
+
     const supporter = await getSupporter(supporterId);
     if (!supporter) {
       throw new HttpError(404);
